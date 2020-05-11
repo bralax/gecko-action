@@ -1,0 +1,15 @@
+name: 'Gecko Code Examination System Action'
+description: 'Push a repository to the Gecko Exam System'
+on:
+- push
+inputs:
+  geckotoken:  # id of input
+    description: 'The gecko token for this repository'
+    required: true
+  githubToken: ${{ secrets.GITHUB_TOKEN }}
+outputs:
+  success:
+    description: 'Whether the upload was successful or not'
+runs:
+  using: 'node12'
+  main: 'index.js'
