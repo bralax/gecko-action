@@ -6,7 +6,9 @@ inputs:
   geckotoken:  # id of input
     description: 'The gecko token for this repository'
     required: true
-  githubToken: ${{ secrets.GITHUB_TOKEN }}
+  githubToken:
+   description: 'A github authentication token'
+   required: true
 outputs:
   success:
     description: 'Whether the upload was successful or not'
