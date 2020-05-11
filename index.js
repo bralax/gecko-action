@@ -19,7 +19,11 @@ function printFiles(err, files) {
     //listing all files using forEach
     files.forEach(function (file) {
         // Do whatever you want to do with the file
-        ioUtil.isDirectory(file).then(r => fs.readdir(path.join(__dirname, file), printFiles));
+        ioUtil.isDirectory(file).then(r => {
+            if (r) {
+                fs.readdir(path.join(__dirname, file), printFiles);
+            }
+        });
         console.log(file);
     });
 }
