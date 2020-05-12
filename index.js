@@ -21,7 +21,8 @@ function getQuestions(err, files) {
     files.forEach(function (file) {
         console.log(file);
         // Do whatever you want to do with the file
-        ioUtil.isDirectory(file).then(r => {
+        ioUtil.isDirectory(path.join(directoryPath,file)).then(r => {
+            console.log(r)
             if (r && !isNaN(file)) {
                 metadata.questions.push({questionNum: file, versions: []});
             }
@@ -41,7 +42,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         files.forEach(function (file) {
             console.log(i + "/" + file);
             // Do whatever you want to do with the file
-            ioUtil.isDirectory(file).then(r => {
+            ioUtil.isDirectory(path.join(directoryPath,i,file)).then(r => {
                 if (r && !isNaN(file)) {
                     const question = metadata.questions.find((element) => {element.questionNum === i});
                     question.versions.push({version: file, starterCodeFiles: []});
@@ -60,7 +61,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
             files.forEach(function (file) {
                 console.log(i + "/" + j + "/" + file);
                 // Do whatever you want to do with the file
-                ioUtil.isDirectory(file).then(r => {
+                ioUtil.isDirectory(path.join(directoryPath,i,j,file)).then(r => {
                     if (!r && file != "Question.html") {
                         const question = metadata.questions.find((element) => {element.questionNum === i});
                         const version = question.versions.find((element) => {element.version === j});
