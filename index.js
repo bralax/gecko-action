@@ -35,7 +35,7 @@ if (count === 0) {
     core.error("This repository does not contain any questions");
 }
 for (let i = 0; i < metadata.questions.length; i++) {
-    files = fs.readdirSync(path.join(directoryPath, metadata.questions[i].questionNum));
+    files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum));
     //listing all files using forEach
     files.forEach(function (file) {
         console.log(i + "/" + file);
@@ -49,7 +49,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         }
     });
     for (let j = 0; j < metadata.questions[i].versions.length; j++) {
-        files = fs.readdirSync(path.join(directoryPath, metadata.questions[i].questionNum, metadata.questions[i].versions[j].version));
+        files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum, "" + metadata.questions[i].versions[j].version));
         //listing all files using forEach
         files.forEach(function (file) {
             console.log(i + "/" + j + "/" + file);
