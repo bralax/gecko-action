@@ -1,12 +1,12 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
-const ioUtil = require('@actions/io/lib/io-util');
+const fetch = require('node-fetch');
 const io = require('@actions/io');
 const path = require('path');
 const fs = require('fs');
 
 const geckoToken = core.getInput('geckoToken');
 const myToken = core.getInput('githubToken');
+const examid = core.getInput('examId');
 
 //joining path of directory
 const directoryPath = process.env.GITHUB_WORKSPACE;
@@ -28,6 +28,20 @@ function getQuestions(files) {
     return count;
 }
 
+function post(url, body, headers) {
+    const header = headers ? headers : new Headers({'Authorization': geckoToken});
+    return fetch("https://polar-earth-21424.herokuapp.com/" + url, {
+        method: 'POST',
+        headers: header,
+        body: body
+    }).then(res => {
+        if (!res.ok) {
+            core.error("Post Failed");
+        }
+        return res;
+    })
+}
+
 
 let files = fs.readdirSync(directoryPath);
 let count = getQuestions(files);
@@ -37,8 +51,11 @@ if (count === 0) {
 for (let i = 0; i < metadata.questions.length; i++) {
     files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum));
     //listing all files using forEach
+    const qNum = metadata.questions[i].questionNum;
+    if (files.length === 0) {
+        core.error("Quetion # " + qNum + " contains no versions");
+    }
     files.forEach(function (file) {
-        const qNum = metadata.questions[i].questionNum;
         console.log(qNum + "/" + file);
         // Do whatever you want to do with the file
         let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + file)).isDirectory();
@@ -49,10 +66,14 @@ for (let i = 0; i < metadata.questions.length; i++) {
     });
     for (let j = 0; j < metadata.questions[i].versions.length; j++) {
         files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum, "" + metadata.questions[i].versions[j].version));
+        const qNum = metadata.questions[i].questionNum;
+        const vNum = metadata.questions[i].versions[j].version;
         //listing all files using forEach
+        if (files.length === 0) {
+            core.error("Quetion # " + qNum + " Version # " + vNum + " contains no files");
+        }
         files.forEach(function (file) {
-            const qNum = metadata.questions[i].questionNum;
-            const vNum = metadata.questions[i].versions[j].version;
+
             console.log(qNum + "/" + vNum + "/" + file);
             // Do whatever you want to do with the file
             let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + vNum,"" + file)).isDirectory();
@@ -66,3 +87,29 @@ for (let i = 0; i < metadata.questions.length; i++) {
 
 
 console.log(metadata);
+post("updateExamGithub", JSON.stringify(metadata)).then(data => {
+    return data.text();
+}).then(data => {
+    if (data === "Success") {
+        metadata.questions.forEach((value => {
+            value.versions.forEach((value1, index, array) => {
+                const fileNames = value1.starterCodeFiles;
+                const files = [];
+                fileNames.forEach(fileName => {
+                    const path = path.join(directoryPath,value.questionNum, value1.version, fileName);
+                    let content = fs.readFileSync(path, {encoding: 'utf8'});
+                    files.push(content);
+                });
+                const formData = new FormData();
+                formData.append("examId" , examid);
+                formData.append("questionNum" , value.questionNum);
+                formData.append("version" , value1.version);
+                formData.append("files", JSON.stringify(files));
+                formData.append("fileNames", JSON.stringify(fileNames));
+                this.post("updateSC", formData);
+            });
+        }));
+    }
+}).catch(reason => {
+    core.error(reason);
+});
