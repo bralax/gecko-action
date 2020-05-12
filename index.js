@@ -38,12 +38,13 @@ for (let i = 0; i < metadata.questions.length; i++) {
     files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum));
     //listing all files using forEach
     files.forEach(function (file) {
-        console.log(i + "/" + file);
+        const qNum = metadata.questions[i].questionNum;
+        console.log(qNum + "/" + file);
         // Do whatever you want to do with the file
-        let r = fs.lstatSync(path.join(directoryPath,"" + i,"" + file)).isDirectory();
+        let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + file)).isDirectory();
         if (r && !isNaN("" + file)) {
             const question = metadata.questions.find((element) => {
-                element.questionNum === i
+                element.questionNum === qNum
             });
             question.versions.push({version: parseInt(file), starterCodeFiles: []});
         }
@@ -52,15 +53,17 @@ for (let i = 0; i < metadata.questions.length; i++) {
         files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum, "" + metadata.questions[i].versions[j].version));
         //listing all files using forEach
         files.forEach(function (file) {
-            console.log(i + "/" + j + "/" + file);
+            const qNum = metadata.questions[i].questionNum;
+            const vNum = metadata.questions[i].versions[j].version;
+            console.log(qNum + "/" + vNum + "/" + file);
             // Do whatever you want to do with the file
-            let r = fs.lstatSync(path.join(directoryPath,"" + i,"" + j,"" + file)).isDirectory();
+            let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + vNum,"" + file)).isDirectory();
             if (!r && file !== "Question.html") {
                 const question = metadata.questions.find((element) => {
-                    element.questionNum === i
+                    element.questionNum === qNum
                 });
                 const version = question.versions.find((element) => {
-                    element.version === j
+                    element.version === vNum
                 });
                 version.starterCodeFiles.push(file);
             }
