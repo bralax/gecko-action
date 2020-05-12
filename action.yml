@@ -9,9 +9,6 @@ inputs:
   examId:  # id of input
     description: 'The examId of the exam to be updating'
     required: true
-  githubToken:
-   description: 'A github authentication token'
-   required: true
 outputs:
   success:
     description: 'Whether the upload was successful or not'
