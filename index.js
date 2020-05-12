@@ -43,9 +43,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         // Do whatever you want to do with the file
         let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + file)).isDirectory();
         if (r && !isNaN("" + file)) {
-            const question = metadata.questions.find((element) => {
-                element.questionNum === qNum
-            });
+            const question = metadata.questions[i];
             question.versions.push({version: parseInt(file), starterCodeFiles: []});
         }
     });
@@ -59,12 +57,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
             // Do whatever you want to do with the file
             let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + vNum,"" + file)).isDirectory();
             if (!r && file !== "Question.html") {
-                const question = metadata.questions.find((element) => {
-                    element.questionNum === qNum
-                });
-                const version = question.versions.find((element) => {
-                    element.version === vNum
-                });
+                const version = metadata.questions[i].versions[j];
                 version.starterCodeFiles.push(file);
             }
         });
