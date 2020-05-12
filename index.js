@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const ioUtil = require('@actions/io/lib/io-util');
+const io = require('@actions/io');
 const path = require('path');
 const fs = require('fs');
 
@@ -10,7 +11,7 @@ const myToken = core.getInput('githubToken');
 //joining path of directory
 const directoryPath = __dirname;
 //passsing directoryPath and callback function
-
+console.log(__dirname);
 function printFiles(err, files) {
     //handling error
     if (err) {
