@@ -20,11 +20,12 @@ function printFiles(err, files) {
     files.forEach(function (file) {
         // Do whatever you want to do with the file
         ioUtil.isDirectory(file).then(r => {
-            if (r && !file.includes('.') && file !== "node_modules") {
+            if (r && !file.includes('.')) {
                 fs.readdir(path.join(__dirname, file), printFiles);
             }
         });
         console.log(file);
     });
 }
+
 fs.readdir(directoryPath, printFiles);
