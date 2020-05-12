@@ -22,7 +22,7 @@ function getQuestions(err, files) {
         console.log(file);
         // Do whatever you want to do with the file
         ioUtil.isDirectory(path.join(directoryPath,file)).then(r => {
-            console.log(r)
+            console.log(!isNaN(file));
             if (r && !isNaN(file)) {
                 metadata.questions.push({questionNum: file, versions: []});
             }
