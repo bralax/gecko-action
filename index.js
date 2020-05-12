@@ -12,63 +12,58 @@ const myToken = core.getInput('githubToken');
 const directoryPath = process.env.GITHUB_WORKSPACE;
 const metadata = {questions: []};
 
-function getQuestions(err, files) {
-    //handling error
-    if (err) {
-        return console.log('Unable to scan directory: ' + err);
-    }
+function getQuestions(files) {
     //listing all files using forEach
+    let count = 0;
     files.forEach(function (file) {
         console.log(file);
         // Do whatever you want to do with the file
-        ioUtil.isDirectory(path.join(directoryPath,file)).then(r => {
-            console.log(!isNaN(file));
-            if (r && !isNaN(file)) {
-                metadata.questions.push({questionNum: file, versions: []});
-            }
-        });
+        let r = fs.lstatSync(path.join(directoryPath,file)).isDirectory();
+        console.log(!isNaN(file));
+        if (r && !isNaN(file)) {
+            metadata.questions.push({questionNum: parseInt(file), versions: []});
+            count++;
+        }
     });
+    return count;
 }
 
 
-fs.readdir(directoryPath, getQuestions);
+let files = fs.readdirSync(directoryPath);
+let count = getQuestions(files);
+if (count === 0) {
+    core.error("This repository does not contain any questions");
+}
 for (let i = 0; i < metadata.questions.length; i++) {
-    fs.readdir(path.join(directoryPath, metadata.questions[i].questionNum),  (err, files) => {
-        //handling error
-        if (err) {
-            return console.log('Unable to scan directory: ' + err);
-        }
-        //listing all files using forEach
-        files.forEach(function (file) {
-            console.log(i + "/" + file);
-            // Do whatever you want to do with the file
-            ioUtil.isDirectory(path.join(directoryPath,i,file)).then(r => {
-                if (r && !isNaN(file)) {
-                    const question = metadata.questions.find((element) => {element.questionNum === i});
-                    question.versions.push({version: file, starterCodeFiles: []});
-                }
+    files = fs.readdirSync(path.join(directoryPath, metadata.questions[i].questionNum));
+    //listing all files using forEach
+    files.forEach(function (file) {
+        console.log(i + "/" + file);
+        // Do whatever you want to do with the file
+        let r = fs.lstatSync(path.join(directoryPath,"" + i,"" + file)).isDirectory();
+        if (r && !isNaN("" + file)) {
+            const question = metadata.questions.find((element) => {
+                element.questionNum === i
             });
-        });
+            question.versions.push({version: parseInt(file), starterCodeFiles: []});
+        }
     });
     for (let j = 0; j < metadata.questions[i].versions.length; j++) {
-        fs.readdir(path.join(directoryPath, metadata.questions[i].questionNum, metadata.questions[i].versions[j].version),
-            (err, files) => {
-            //handling error
-            if (err) {
-                return console.log('Unable to scan directory: ' + err);
-            }
-            //listing all files using forEach
-            files.forEach(function (file) {
-                console.log(i + "/" + j + "/" + file);
-                // Do whatever you want to do with the file
-                ioUtil.isDirectory(path.join(directoryPath,i,j,file)).then(r => {
-                    if (!r && file != "Question.html") {
-                        const question = metadata.questions.find((element) => {element.questionNum === i});
-                        const version = question.versions.find((element) => {element.version === j});
-                        version.starterCodeFiles.push(file);
-                    }
+        files = fs.readdirSync(path.join(directoryPath, metadata.questions[i].questionNum, metadata.questions[i].versions[j].version);
+        //listing all files using forEach
+        files.forEach(function (file) {
+            console.log(i + "/" + j + "/" + file);
+            // Do whatever you want to do with the file
+            let r = fs.lstatSync(path.join(directoryPath,"" + i,"" + j,"" + file)).isDirectory();
+            if (!r && file !== "Question.html") {
+                const question = metadata.questions.find((element) => {
+                    element.questionNum === i
                 });
-            });
+                const version = question.versions.find((element) => {
+                    element.version === j
+                });
+                version.starterCodeFiles.push(file);
+            }
         });
     }
 }
