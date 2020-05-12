@@ -9,9 +9,8 @@ const geckoToken = core.getInput('geckoToken');
 const myToken = core.getInput('githubToken');
 
 //joining path of directory
-const directoryPath = __dirname;
-//passsing directoryPath and callback function
-console.log(__dirname);
+const directoryPath = process.env.GITHUB_WORKSPACE;
+
 function printFiles(err, files) {
     //handling error
     if (err) {
