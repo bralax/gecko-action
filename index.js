@@ -19,6 +19,7 @@ function getQuestions(err, files) {
     }
     //listing all files using forEach
     files.forEach(function (file) {
+        console.log(file);
         // Do whatever you want to do with the file
         ioUtil.isDirectory(file).then(r => {
             const num = /^\d+$/.test(file);
@@ -39,6 +40,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         }
         //listing all files using forEach
         files.forEach(function (file) {
+            console.log(i + "/" + file);
             // Do whatever you want to do with the file
             ioUtil.isDirectory(file).then(r => {
                 const num = /^\d+$/.test(file);
@@ -58,6 +60,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
             }
             //listing all files using forEach
             files.forEach(function (file) {
+                console.log(i + "/" + j + "/" + file);
                 // Do whatever you want to do with the file
                 ioUtil.isDirectory(file).then(r => {
                     if (!r && file != "Question.html") {
