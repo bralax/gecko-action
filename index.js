@@ -22,8 +22,7 @@ function getQuestions(err, files) {
         console.log(file);
         // Do whatever you want to do with the file
         ioUtil.isDirectory(file).then(r => {
-            const num = /^\d+$/.test(file);
-            if (r && num) {
+            if (r && !isNaN(file)) {
                 metadata.questions.push({questionNum: file, versions: []});
             }
         });
@@ -43,8 +42,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
             console.log(i + "/" + file);
             // Do whatever you want to do with the file
             ioUtil.isDirectory(file).then(r => {
-                const num = /^\d+$/.test(file);
-                if (r && num) {
+                if (r && !isNaN(file)) {
                     const question = metadata.questions.find((element) => {element.questionNum === i});
                     question.versions.push({version: file, starterCodeFiles: []});
                 }
