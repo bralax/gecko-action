@@ -50,6 +50,17 @@ let count = getQuestions(files);
 if (count === 0) {
     failed("This repository does not contain any questions");
 }
+const qNums = metadata.questions.map(obj => obj.questionNum);
+qNums.sort((a, b) => a - b);
+if (qNums[0] !== 1) {
+    failed("Missing Question # 1");
+}
+for (var i = 1; i < qNums.length; i++) {
+    const expectedIndex = qNums[i-1] + 1;
+    if (qNums[i] !== expectedIndex) {
+        failed("Missing question #" + expectedIndex);
+    }
+}
 for (let i = 0; i < metadata.questions.length; i++) {
     files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum));
     const qNum = metadata.questions[i].questionNum;
@@ -57,13 +68,26 @@ for (let i = 0; i < metadata.questions.length; i++) {
         failed("Quetion # " + qNum + " contains no versions");
     }
     files.forEach(function (file) {
-        console.log(qNum + "/" + file);
         let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + file)).isDirectory();
         if (r && !isNaN("" + file)) {
             const question = metadata.questions[i];
             question.versions.push({version: parseInt(file), starterCodeFiles: []});
         }
     });
+    if (metadata.questions[i].versions === 0) {
+        failed("Question # " + qNum + " has no versions!");
+    }
+    const vNums = metadata.questions[i].versions.map(obj => obj.version);
+    vNums.sort((a, b) => a - b);
+    if (vNums[0] !== 1) {
+        failed("Missing Question # " + qNum +" Version # 1");
+    }
+    for (var x = 1; x < vNums.length; x++) {
+        const expectedIndex = vNums[x-1] + 1;
+        if (vNums[x] !== expectedIndex) {
+            failed("Missing question #" + expectedIndex);
+        }
+    }
     for (let j = 0; j < metadata.questions[i].versions.length; j++) {
         files = fs.readdirSync(path.join(directoryPath, "" + metadata.questions[i].questionNum, "" + metadata.questions[i].versions[j].version));
         const qNum = metadata.questions[i].questionNum;
@@ -78,6 +102,9 @@ for (let i = 0; i < metadata.questions.length; i++) {
                 version.starterCodeFiles.push(file);
             }
         });
+        if (metadata.questions[i].versions[j].starterCodeFiles.length === 0) {
+            failed("Question # " + qNum + " Version #" + vNum + " has no starter files");
+        }
     }
 }
 
