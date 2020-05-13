@@ -3,6 +3,8 @@ const fetch = require('node-fetch');
 const io = require('@actions/io');
 const path = require('path');
 const fs = require('fs');
+const FormData = require('form-data');
+
 
 const geckoToken = core.getInput('geckoToken');
 const myToken = core.getInput('githubToken');
