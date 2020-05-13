@@ -111,13 +111,13 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 formData.append("version" , value1.version);
                 formData.append("files", JSON.stringify(files));
                 formData.append("fileNames", JSON.stringify(fileNames));
-                this.post("updateSC", formData);
+                post("updateSC", formData);
                 const forms = new FormData();
                 forms.append("examId" , examId);
                 forms.append("questionNum" , value.questionNum);
                 forms.append("version" , value1.version);
                 forms.append("instructions", "" + instructionContent);
-                this.post("updateQP", forms);
+                post("updateQP", forms);
 
             });
 
