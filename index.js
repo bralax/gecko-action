@@ -104,6 +104,7 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                     files.push(content);
                 });
                 const cur = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
+                console.log(cur);
                 let instructionContent = fs.readFileSync(cur, {encoding: 'utf8'});
                 const formData = new FormData();
                 formData.append("examId" , examid);
@@ -117,6 +118,7 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 forms.append("questionNum" , value.questionNum);
                 forms.append("version" , value1.version);
                 forms.append("instructions", "" + instructionContent);
+                console.log(forms);
                 post("updateQP", forms);
 
             });
