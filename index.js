@@ -10,7 +10,7 @@ const examid = core.getInput('examId');
 
 //joining path of directory
 const directoryPath = process.env.GITHUB_WORKSPACE;
-const metadata = {questions: []};
+const metadata = {questions: [], examid: examid};
 
 function getQuestions(files) {
     //listing all files using forEach
@@ -100,6 +100,8 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                     let content = fs.readFileSync(path, {encoding: 'utf8'});
                     files.push(content);
                 });
+                const path = path.join(directoryPath, value.questionNum, value1.version, "Question.html");
+                let instructionContent = fs.readFileSync(path, {encoding: 'utf8'});
                 const formData = new FormData();
                 formData.append("examId" , examid);
                 formData.append("questionNum" , value.questionNum);
@@ -107,7 +109,15 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 formData.append("files", JSON.stringify(files));
                 formData.append("fileNames", JSON.stringify(fileNames));
                 this.post("updateSC", formData);
+                const forms = new FormData();
+                forms.append("examId" , examId);
+                forms.append("questionNum" , value.questionNum);
+                forms.append("version" , value1.version);
+                forms.append("instructions", "" + instructionContent);
+                this.post("updateQP", forms);
+
             });
+
         }));
     }
 }).catch(reason => {
