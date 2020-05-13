@@ -97,11 +97,11 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 const fileNames = value1.starterCodeFiles;
                 const files = [];
                 fileNames.forEach(fileName => {
-                    const curpath = path.join(directoryPath,value.questionNum, value1.version, fileName);
+                    const curpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
                     let content = fs.readFileSync(curpath, {encoding: 'utf8'});
                     files.push(content);
                 });
-                const cur = path.join(directoryPath, value.questionNum, value1.version, "Question.html");
+                const cur = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
                 let instructionContent = fs.readFileSync(cur, {encoding: 'utf8'});
                 const formData = new FormData();
                 formData.append("examId" , examid);
