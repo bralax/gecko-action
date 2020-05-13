@@ -29,7 +29,7 @@ function getQuestions(files) {
 }
 
 function post(url, body, headers) {
-    const header = headers ? headers : new Headers({'Authorization': geckoToken});
+    const header = headers ? headers : new fetch.Headers({'Authorization': geckoToken});
     return fetch("https://polar-earth-21424.herokuapp.com/" + url, {
         method: 'POST',
         headers: header,
