@@ -109,7 +109,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
 }
 
 
-post("updateExamGithub", JSON.stringify(metadata)).then(data => {
+post("exams/github", JSON.stringify(metadata)).then(data => {
     return data.text();
 }).then(data => {
     if (data === "Success") {
@@ -130,7 +130,7 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 formData.append("version" , value1.version);
                 formData.append("files", JSON.stringify(files));
                 formData.append("fileNames", JSON.stringify(fileNames));
-                post("updateSC", formData).catch(reason => {
+                post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/starter", formData).catch(reason => {
                     failed(reason);
                 });
                 const forms = new FormData();
@@ -138,7 +138,7 @@ post("updateExamGithub", JSON.stringify(metadata)).then(data => {
                 forms.append("questionNum" , value.questionNum);
                 forms.append("version" , value1.version);
                 forms.append("instructions", "" + instructionContent);
-                post("updateQP", forms).catch(reason => {
+                post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt", forms).catch(reason => {
                     failed(reason);
                 });
 
