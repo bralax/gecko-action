@@ -71,7 +71,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + file)).isDirectory();
         if (r && !isNaN("" + file)) {
             const question = metadata.questions[i];
-            question.versions.push({version: parseInt(file), starterCodeFiles: []});
+            question.versions.push({version: parseInt(file), starterCodeFiles: [], type: 'LongResponse'});
         }
     });
     if (metadata.questions[i].versions === 0) {
@@ -100,6 +100,17 @@ for (let i = 0; i < metadata.questions.length; i++) {
             if (!r && file !== "Question.html") {
                 const version = metadata.questions[i].versions[j];
                 version.starterCodeFiles.push(file);
+                //Determine Question type
+                if (file === 'mcinfo.json') {
+                    version.type = 'MultipleChoice';
+                } else if (file === 'srinfo.json') {
+                    version.type = 'ShortResponse';
+                } else if (file.substring(file.lastIndexOf('.')) + 1 === 'txt') {
+                    version.type = 'LongResponse';
+                } else {
+                    version.type = 'Code';
+                }
+                
             }
         });
         if (metadata.questions[i].versions[j].starterCodeFiles.length === 0) {
@@ -115,13 +126,20 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
     if (data === "Success") {
         metadata.questions.forEach((value => {
             value.versions.forEach((value1, index, array) => {
-                const fileNames = value1.starterCodeFiles;
+                const fileNames = value1.starterCodeFiles.map((file) => {
+                    if (file === 'mcinfo.json' || file === 'srinfo.json') {
+                        return 'info.json';
+                    } else {
+                        return file;
+                    }
+                });
                 const files = [];
                 fileNames.forEach(fileName => {
                     const curpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
                     let content = fs.readFileSync(curpath, {encoding: 'utf8'});
                     files.push(content);
                 });
+                
                 const cur = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
                 let instructionContent = fs.readFileSync(cur, {encoding: 'utf8'});
                 const formData = new FormData();
