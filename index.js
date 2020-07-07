@@ -148,6 +148,7 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                 formData.append("version" , value1.version);
                 formData.append("files", JSON.stringify(files));
                 formData.append("fileNames", JSON.stringify(fileNames));
+                formData.append("fileData", JSON.stringify('{}'));
                 post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/starter", formData).catch(reason => {
                     failed(reason);
                 });
@@ -155,7 +156,7 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                 forms.append("examId" , examid);
                 forms.append("questionNum" , value.questionNum);
                 forms.append("version" , value1.version);
-                forms.append("instructions", "" + instructionContent);
+                forms.append("prompt", "" + instructionContent);
                 post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt", forms).catch(reason => {
                     failed(reason);
                 });
