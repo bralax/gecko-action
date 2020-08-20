@@ -134,7 +134,7 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                     }
                 });
                 const files = [];
-                fileNames.forEach(fileName => {
+                value1.starterCodeFiles.forEach(fileName => {
                     const curpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
                     let content = fs.readFileSync(curpath, {encoding: 'utf8'});
                     files.push(content);
