@@ -49,7 +49,7 @@ function parseGeckoIgnore(fileContent) {
     const patterns = [];
     for (const line of lines) {
         if (line !== "" && line.charAt(0) !== "#") {
-            patterns.push(line.trim());
+            patterns.push(new RegExp(line.trim()));
         }
     }
     return patterns;
