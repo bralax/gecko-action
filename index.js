@@ -44,6 +44,17 @@ function failed(message) {
     process.exit(1);
 }
 
+function parseGeckoIgnore(fileContent) {
+    let lines = fileContent.split(/\r\n|\r|\n/);
+    const patterns = [];
+    for (const line of lines) {
+        if (line !== "" && line.charAt(0) !== "#") {
+            patterns.push(line.trim());
+        }
+    }
+    return patterns;
+}
+
 
 let files = fs.readdirSync(directoryPath);
 let count = getQuestions(files);
@@ -95,9 +106,20 @@ for (let i = 0; i < metadata.questions.length; i++) {
         if (files.length === 0) {
             failed("Quetion # " + qNum + " Version # " + vNum + " contains no files");
         }
+        const ignoreLoc = path.join(directoryPath, "" + qNum, "" + vNum, ".geckoignore");
+        let patterns = [];
+        if (fs.existsSync(ignoreLoc)) {
+            const content = fs.readFileSync(curHTML, {encoding: 'utf8'});
+            patterns = parseGeckoIgnore(content);
+        }
+        
         files.forEach(function (file) {
             let r = fs.lstatSync(path.join(directoryPath,"" + qNum,"" + vNum,"" + file)).isDirectory();
-            if (!r && file !== "Question.html") {
+            let match = false;
+            for (const pattern of patterns) {
+                match = match || pattern.test(file);
+            }
+            if (!r && file !== "Question.html" && file !== "Question.md" && file !== ".geckoignore" && !match) {
                 const version = metadata.questions[i].versions[j];
                 version.starterCodeFiles.push(file);
                 //Determine Question type
@@ -140,8 +162,6 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                     files.push(content);
                 });
                 
-                const cur = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
-                let instructionContent = fs.readFileSync(cur, {encoding: 'utf8'});
                 const formData = new FormData();
                 formData.append("examId" , examid);
                 formData.append("questionNum" , value.questionNum);
@@ -152,15 +172,32 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                 post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/starter", formData).catch(reason => {
                     failed(reason);
                 });
-                const forms = new FormData();
-                forms.append("examId" , examid);
-                forms.append("questionNum" , value.questionNum);
-                forms.append("questionVer" , value1.version);
-                forms.append("prompt", "" + instructionContent);
-                post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt", forms).catch(reason => {
-                    failed(reason);
-                });
 
+                const curHTML = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
+                const curMD = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.md");
+                if (fs.existsSync(curHTML)) {
+                    let instructionContent = fs.readFileSync(curHTML, {encoding: 'utf8'});
+                    const forms = new FormData();
+                    forms.append("examId" , examid);
+                    forms.append("questionNum" , value.questionNum);
+                    forms.append("questionVer" , value1.version);
+                    forms.append("prompt", "" + instructionContent);
+                    post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt", forms).catch(reason => {
+                        failed(reason);
+                    });
+                } else if (fs.existsSync(curMD)) {
+                    let instructionContent = fs.readFileSync(curMD, {encoding: 'utf8'});
+                    const forms = new FormData();
+                    forms.append("examId" , examid);
+                    forms.append("questionNum" , value.questionNum);
+                    forms.append("questionVer" , value1.version);
+                    forms.append("prompt", "" + instructionContent);
+                    post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt?isMarkdown=true", forms).catch(reason => {
+                        failed(reason);
+                    });
+                } else {
+                    failed("Question #" + value.questionNum + " is missing an html/markdown file for the prompt");
+                }
             });
 
         }));

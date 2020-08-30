@@ -2,6 +2,8 @@
 
 This action takes a properly formatted github repo and uploads it as an exam to the Gecko Exam System.
 
+Current Version: v3.0
+   
 ## Inputs
 
 ### `geckoToken`
@@ -13,26 +15,43 @@ This action takes a properly formatted github repo and uploads it as an exam to 
 **Required** A examId provied by gecko used to authenticate who is pushing to the repo. To get an examId, create an exam on the gecko website and then copy the id that appears when you press the generate token button.
 
 ## Repo Formatting
-The top level of the repository should contain the folders that represent each question. The question folders should be named with a number starting at 1 increasing by one. The second level contains folders representing the versions of the question. They should be named in the same way as the top level. Each version folder should contain all the information about the given question. See below for what information you need for each question type. All question types require a Question.html file which contains the questions prompt.   
+The top level of the repository should contain the folders that represent each question. The question folders should be named with a number starting at 1 increasing by one. The second level contains folders representing the versions of the question. They should be named in the same way as the top level. Each version folder should contain all the information about the given question. See below for what information you need for each question type. All question types require a Question.html/Question.md file which should contain all information related to the questions prompt.   
 ├── 1  
 │   ├── 1  
-│   │   ├── Question.html  
+│   │   ├── Question.[html/md]
+|   |   ├── [.geckoignore]
 │   │   └── Additional Question Files  
 │   └── 2  
-│       ├── Question.html  
-│      └── Additional Question Files  
+│       ├── Question.[html/md]  
+|       ├── [.geckoignore]
+│       └── Additional Question Files  
 └── 2  
     └── 1  
-        ├── Question.html  
+        ├── Question.[html/md]  
+        ├── [.geckoignore]
         └── Additional Question Files  
-   
-   
+
+## Gecko Ignore Files
+This tool allows for a method of ignoring files similar to git's `.gitignore` files. The name for these files should be `.geckoignore`.
+There are a couple of specific rules about `.geckoignore` files.
+1. The file should contain a single filename or regex per line
+2. `.geckoignore` files have no understanding of sub-directories which has two implications:
+      1. The file needs to be in the bottom directory (any `.geckoignore` file will not be handled correctly on the top two levels)
+      2. You can not use paths such as dir/*/{some-file} as we dont recognize directories
+3. The system will ignore blank lines
+4. The system automatically ignores subdirectories below the question version directory. Nothing from those sub-directories will be acknowledged or uploaded        
+
+## Markdown Support
+This action accepts both HTML and Markdown files for the question prompt. Our markdown parser tries to match all the features available in Markdown files posted on Github.com. For a guide on our markdown syntax see [https://guides.github.com/features/mastering-markdown/](https://guides.github.com/features/mastering-markdown/)
+      
 ## Question Types
 
-The system currently supports four different question types. All four of the types require a Question.html file in each question directory. What changes between the question types is what else will need to be included for the system to properly read the question.
+The system currently supports four different question types. All four of the types require a Question.[html/md] file in each question directory. What changes between the question types is what else will need to be included for the system to properly read the question.
 
+**Note:** If a question folder has both a Question.html and a Question.md file, the system will use the Question.html as the prompt and will ignore the Question.md file completely
+   
 ### Code Question         
-This is the default type of question that system interprets. The system looks for any additional files outside of the Question.html to determine the starter code for the question. There must be at least one additional file besides the Question.html file.
+This is the default type of question that system interprets. The system looks for any additional files outside of the Question.html to determine the starter code for the question. There must be at least one additional file besides the Question.[html/md] file.
 The language of the starter code will be intepreted from the files extension.
 
    
