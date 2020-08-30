@@ -109,7 +109,7 @@ for (let i = 0; i < metadata.questions.length; i++) {
         const ignoreLoc = path.join(directoryPath, "" + qNum, "" + vNum, ".geckoignore");
         let patterns = [];
         if (fs.existsSync(ignoreLoc)) {
-            const content = fs.readFileSync(curHTML, {encoding: 'utf8'});
+            const content = fs.readFileSync(ignoreLoc, {encoding: 'utf8'});
             patterns = parseGeckoIgnore(content);
         }
         
