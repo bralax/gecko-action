@@ -16,6 +16,8 @@ Current Version: v3.0
 
 ## Repo Formatting
 The top level of the repository should contain the folders that represent each question. The question folders should be named with a number starting at 1 increasing by one. The second level contains folders representing the versions of the question. They should be named in the same way as the top level. Each version folder should contain all the information about the given question. See below for what information you need for each question type. All question types require a Question.html/Question.md file which should contain all information related to the questions prompt.   
+
+```
 ├── 1  
 │   ├── 1  
 │   │   ├── Question.[html/md]
@@ -30,7 +32,8 @@ The top level of the repository should contain the folders that represent each q
         ├── Question.[html/md]  
         ├── [.geckoignore]
         └── Additional Question Files  
-
+```
+   
 ## Gecko Ignore Files
 This tool allows for a method of ignoring files similar to git's `.gitignore` files. The name for these files should be `.geckoignore`.
 There are a couple of specific rules about `.geckoignore` files.
@@ -165,7 +168,9 @@ index | integer | The id assigned to the question used to reference the question
       
 ## Example usage
 
-uses: actions/gecko-action@v1
+```
+uses: actions/gecko-action@v3.0
 with:
   geckoToken: '{insert token here}'
   examId: '{insert id here}'
+```
