@@ -27,7 +27,7 @@ function getQuestions(files) {
 
 function post(url, body, headers) {
     const header = headers ? headers : new fetch.Headers({'Authorization': geckoToken});
-    return fetch("https://polar-earth-21424.herokuapp.com/" + url, {
+    return fetch("https://gecko.cs.jhu.edu/" + url, {
         method: 'POST',
         headers: header,
         body: body
@@ -148,7 +148,15 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
     if (data === "Success") {
         metadata.questions.forEach((value => {
             value.versions.forEach((value1, index, array) => {
-                const fileNames = value1.starterCodeFiles.map((file) => {
+                /**/
+                value1.starterCodeFiles.forEach(file => {
+                    if (file === 'mcinfo.json' || file === 'srinfo.json') {
+                       const curpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
+                       const newpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
+                       fs.renameSync(curpath, newpath);
+                    } 
+                });
+                const filenames = value1.starterCodeFiles.map((file) => {
                     if (file === 'mcinfo.json' || file === 'srinfo.json') {
                         return 'info.json';
                     } else {
@@ -156,18 +164,17 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                     }
                 });
                 const files = [];
-                value1.starterCodeFiles.forEach(fileName => {
+                filenames.forEach(fileName => {
                     const curpath = path.join(directoryPath,"" + value.questionNum, "" + value1.version, "" + fileName);
-                    let content = fs.readFileSync(curpath, {encoding: 'utf8'});
-                    files.push(content);
+                    let file = fs.createReadStream(curpath);
+                    files.push(file);
                 });
                 
                 const formData = new FormData();
                 formData.append("examId" , examid);
                 formData.append("questionNum" , value.questionNum);
                 formData.append("questionVer" , value1.version);
-                formData.append("files", JSON.stringify(files));
-                formData.append("fileNames", JSON.stringify(fileNames));
+                formData.append("files", files);
                 formData.append("fileData", JSON.stringify('{}'));
                 post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/starter", formData).catch(reason => {
                     failed(reason);
@@ -176,22 +183,20 @@ post("exams/github", JSON.stringify(metadata)).then(data => {
                 const curHTML = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.html");
                 const curMD = path.join(directoryPath, "" + value.questionNum, "" + value1.version, "Question.md");
                 if (fs.existsSync(curHTML)) {
-                    let instructionContent = fs.readFileSync(curHTML, {encoding: 'utf8'});
                     const forms = new FormData();
                     forms.append("examId" , examid);
                     forms.append("questionNum" , value.questionNum);
                     forms.append("questionVer" , value1.version);
-                    forms.append("prompt", "" + instructionContent);
+                    forms.append("file", fs.createReadStream(curHTML));
                     post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt", forms).catch(reason => {
                         failed(reason);
                     });
                 } else if (fs.existsSync(curMD)) {
-                    let instructionContent = fs.readFileSync(curMD, {encoding: 'utf8'});
                     const forms = new FormData();
                     forms.append("examId" , examid);
                     forms.append("questionNum" , value.questionNum);
                     forms.append("questionVer" , value1.version);
-                    forms.append("prompt", "" + instructionContent);
+                    forms.append("file", fs.createReadStream(curMD));
                     post("exams/"+examid+"/questions/"+value.questionNum+"/"+value1.version+"/prompt?isMarkdown=true", forms).catch(reason => {
                         failed(reason);
                     });

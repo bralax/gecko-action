@@ -169,7 +169,7 @@ index | integer | The id assigned to the question used to reference the question
 ## Example usage
 
 ```
-uses: actions/gecko-action@v3.0
+uses: actions/gecko-action@v4.0
 with:
   geckoToken: '{insert token here}'
   examId: '{insert id here}'
